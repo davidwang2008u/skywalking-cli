@@ -30,6 +30,34 @@ Then copy the `./bin/swctl-latest-(darwin|linux|windows)-amd64` to your `PATH` d
 usually `/usr/bin/` or `/usr/local/bin`, or you can copy it to any directory you like,
 and add that directory to `PATH`, we recommend you to rename the `swctl-latest-(darwin|linux|windows)-amd64` to `swctl`.
 
+复用部分功能
+===============
+必须做这个操作，不然make失败
+```
+git submodule init
+git submodule update
+```
+# qlgen
+query-protocol目录下的graphqls文件是从skywalking拷贝过来的
+GQL_GEN = $(GO_PATH)/bin/gqlgen
+配置文件是根目录下的gqlgen.yml
+```
+schema:
+  - query-protocol/*.graphqls
+
+skip_validation: true
+
+model:
+  filename: graphql/schema/schema.go
+  package: schema
+
+models:
+  Long:
+    model: github.com/99designs/gqlgen/graphql.Int64
+```
+
+
+
 # Commands
 Commands in SkyWalking CLI are organized into two levels, in the form of `swctl --option <level1> --option <level2> --option`,
 there're options in each level, which should follow right after the corresponding command, take the following command as example:
