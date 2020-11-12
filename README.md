@@ -32,12 +32,26 @@ and add that directory to `PATH`, we recommend you to rename the `swctl-latest-(
 
 复用部分功能
 ===============
+
 必须做这个操作，不然make失败
 ```
 git submodule init
 git submodule update
 ```
+注意
+git子模块
+可以通过在 git submodule add 命令后面加上想要跟踪的项目的相对或绝对 URL 来添加新的子模块
+注意到新的 .gitmodules 文件。 该配置文件保存了项目 URL 与已经拉取的本地目录之间的映射
+```
+[submodule "query-protocol"]
+	path = query-protocol
+	url = http://github.com/apache/skywalking-query-protocol/
+```
+git submodule update命令会将http://github.com/apache/skywalking-query-protocol/放到query-protocol目录下
+默认情况下，子模块会将子项目放到一个与仓库同名的目录中，这里修改了名字
+
 # gqlgen
+文档路径 https://gqlgen.com/getting-started/
 query-protocol目录下的graphqls文件是从skywalking拷贝过来的
 GQL_GEN = $(GO_PATH)/bin/gqlgen
 配置文件是根目录下的gqlgen.yml
@@ -67,6 +81,12 @@ models:
     model: github.com/99designs/gqlgen/graphql.Int64
 ```
 
+# GraphQL是
+https://zhuanlan.zhihu.com/p/40348143
+GraphQL 是一款由 Facebook 主导开发的数据查询和操作语言， 写过 SQL 查询的同学可以把它想象成是 SQL 查询语言，但 GraphQL 是给客户端查询数据用的。虽然这让你听起来觉得像是一款数据库软件，但实际上 GraphQL 并不是数据库软件。 你可以将 GraphQL 理解成一个中间件，是连接客户端和数据库之间的一座桥梁，客户端给它一个描述，然后从数据库中组合出符合这段描述的数据返回。这也意味着 GraphQL 并不关心数据存在什么数据库上。
+GraphQL核心概念
+https://blog.csdn.net/liuyh73/article/details/85010148
+
 # Schema
 https://graphql.cn/learn/schema/
 定义您的schema
@@ -94,6 +114,7 @@ federation:
   package: generated
 
 # Where should any generated models go?
+# 创建model
 model:
   filename: graph/model/models_gen.go
   package: model
@@ -137,6 +158,9 @@ models:
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int3
 ```
+# 使用gqlgen构建GraphQL服务
+https://blog.csdn.net/liuyh73/article/details/85028977
+https://www.cnblogs.com/rongfengliang/p/9364783.html
 
 # packr
 使用packr包把静态文件打包进二进制内
