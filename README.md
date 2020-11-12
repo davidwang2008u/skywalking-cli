@@ -55,6 +55,8 @@ models:
   Long:
     model: github.com/99designs/gqlgen/graphql.Int64
 ```
+# Schema
+https://graphql.cn/learn/schema/
 
 
 
