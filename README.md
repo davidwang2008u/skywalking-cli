@@ -37,7 +37,7 @@ and add that directory to `PATH`, we recommend you to rename the `swctl-latest-(
 git submodule init
 git submodule update
 ```
-# qlgen
+# gqlgen
 query-protocol目录下的graphqls文件是从skywalking拷贝过来的
 GQL_GEN = $(GO_PATH)/bin/gqlgen
 配置文件是根目录下的gqlgen.yml
@@ -55,11 +55,119 @@ models:
   Long:
     model: github.com/99designs/gqlgen/graphql.Int64
 ```
+gqlgen是用于构建GraphQL服务器的Go库。
+gqlgen is based on a Schema first approach-您可以使用GraphQL模式定义语言来定义API。
+gqlgen优先考虑类型安全性-您在此永远都不会看到map [string] interface {}。
+gqlgen启用了Codegen-我们生成了无聊的代码，因此您可以专注于快速构建应用程序。
+
+解析的是类型 long
+```
+models:
+  Long:
+    model: github.com/99designs/gqlgen/graphql.Int64
+```
+
 # Schema
 https://graphql.cn/learn/schema/
+定义您的schema
+gqlgen是一个架构优先的库-在编写代码之前，您使用GraphQL架构定义语言描述您的API。 默认情况下，它进入一个名为schema.graphql的文件中，但是您可以根据需要将其分解为多个不同的文件。
 
+如下是gqlgen.yml配置范例
+exec如没有配置，则不会生产server code
+model配置了就会生成model代码
+models我理解就是配置特殊的类型
+https://gqlgen.com/config/
 
+```
+# Where are all the schema files located? globs are supported eg  src/**/*.graphqls
+schema:
+  - graph/*.graphqls
 
+# Where should the generated server code go?
+exec:
+  filename: graph/generated/generated.go
+  package: generated
+
+# Enable Apollo federation support
+federation:
+  filename: graph/generated/federation.go
+  package: generated
+
+# Where should any generated models go?
+model:
+  filename: graph/model/models_gen.go
+  package: model
+
+# Where should the resolver implementations go?
+resolver:
+  layout: follow-schema
+  dir: graph
+  package: graph
+  filename_template: "{name}.resolvers.go"
+
+# Optional: turn on use ` + "`" + `gqlgen:"fieldName"` + "`" + ` tags in your models
+# struct_tag: json
+
+# Optional: turn on to use []Thing instead of []*Thing
+# omit_slice_element_pointers: false
+
+# Optional: set to speed up generation time by not performing a final validation pass.
+# skip_validation: true
+
+# gqlgen will search for any type names in the schema in these go packages
+# if they match it will use them, otherwise it will generate them.
+autobind:
+  - "github.com/your/app/graph/model"
+
+# This section declares type mapping between the GraphQL and go type systems
+#
+# The first line in each type will be used as defaults for resolver arguments and
+# modelgen, the others will be allowed when binding to fields. Configure them to
+# your liking
+models:
+  ID:
+    model:
+      - github.com/99designs/gqlgen/graphql.ID
+      - github.com/99designs/gqlgen/graphql.Int
+      - github.com/99designs/gqlgen/graphql.Int64
+      - github.com/99designs/gqlgen/graphql.Int32
+  Int:
+    model:
+      - github.com/99designs/gqlgen/graphql.Int
+      - github.com/99designs/gqlgen/graphql.Int64
+      - github.com/99designs/gqlgen/graphql.Int3
+```
+
+# packr
+使用packr包把静态文件打包进二进制内
+https://www.cnblogs.com/taoshihan/p/13144080.html
+
+```
+D:\go_workspace\skywalking-cli>
+D:\go_workspace\skywalking-cli>packr2 -help
+Error: unknown shorthand flag: 'e' in -elp
+Usage:
+  packr2 [flags]
+  packr2 [command]
+
+Available Commands:
+  build       Wraps the go build command with packr
+  clean       removes any *-packr.go files
+  fix         will attempt to fix a application's API to match packr version v2.8.0
+  help        Help about any command
+  install     Don't. ru
+  version     shows packr version
+
+Flags:
+  -h, --help               help for packr2
+      --ignore-imports     when set to true packr won't resolve imports for boxes
+      --legacy             uses the legacy resolution and packing system (assumes first arg || pwd for input path)
+      --silent             silences all output
+      --store-cmd string   sub command to use for packing
+  -v, --verbose            enables verbose logging
+
+Use "packr2 [command] --help" for more information about a command.
+```
 # Commands
 Commands in SkyWalking CLI are organized into two levels, in the form of `swctl --option <level1> --option <level2> --option`,
 there're options in each level, which should follow right after the corresponding command, take the following command as example:
